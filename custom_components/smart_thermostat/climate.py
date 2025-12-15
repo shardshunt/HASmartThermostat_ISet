@@ -817,10 +817,9 @@ class SmartThermostat(ClimateEntity, RestoreEntity, ABC):
     async def clear_integral(self, **kwargs):
         """Clear the integral value."""
         value = float(kwargs.get("value", 0.0))
-        if self._pid_controller is not None:
-            self._pid_controller.integral = value
-            self._i = self._pid_controller.integral
-            self.async_write_ha_state()
+        self._pid_controller.integral = value
+        self._i = self._pid_controller.integral
+        self.async_write_ha_state()
 
     @property
     def min_temp(self):
