@@ -242,7 +242,9 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     )
     platform.async_register_entity_service(  # type: ignore
         "clear_integral",
-        {},
+        {
+            vol.Optional("value", default=0.0): vol.Coerce(float),
+        },
         "clear_integral",
     )
 
@@ -814,9 +816,11 @@ class SmartThermostat(ClimateEntity, RestoreEntity, ABC):
 
     async def clear_integral(self, **kwargs):
         """Clear the integral value."""
-        self._pid_controller.integral = 0.0
-        self._i = self._pid_controller.integral
-        self.async_write_ha_state()
+        value = float(kwargs.get("value", 0.0))
+        if self._pid_controller is not None:
+            self._pid_controller.integral = value
+            self._i = self._pid_controller.integral
+            self.async_write_ha_state()
 
     @property
     def min_temp(self):
